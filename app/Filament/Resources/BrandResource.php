@@ -26,6 +26,7 @@ use Filament\Forms\Components\MarkdownEditor;
 use App\Filament\Resources\BrandResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\BrandResource\RelationManagers;
+use Illuminate\Database\Eloquent\Model;
 
 class BrandResource extends Resource
 {
@@ -34,6 +35,15 @@ class BrandResource extends Resource
     protected static ?int $navigationSort = 1;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $recordTitleAttribute = 'name';
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'name',
+            'slug',
+            'description',
+        ];
+    }
 
     public static function form(Form $form): Form
     {

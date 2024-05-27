@@ -14,24 +14,25 @@ use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Section;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Forms\Components\MarkdownEditor;
 use App\Filament\Resources\ProductResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ProductResource\RelationManagers;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 
 class ProductResource extends Resource
 {
@@ -40,6 +41,30 @@ class ProductResource extends Resource
     protected static ?string $navigationGroup = 'Shop';
     protected static ?int $navigationSort = 0;
     protected static ?string $navigationLabel = 'Products';
+
+    protected static ?int $globalSearchResultLimit = 20;
+
+    protected static ?string $recordTitleAttribute = 'name';
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'name',
+            'slug',
+            'description',
+        ];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'Brand' => $record->brand->name,
+        ];
+    }
+
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->with(['brand']);
+    }
 
     public static function form(Form $form): Form
     {

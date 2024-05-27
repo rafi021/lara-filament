@@ -2,30 +2,31 @@
 
 namespace App\Filament\Resources;
 
-use App\Enums\OrderStatusEnum;
-use App\Filament\Resources\OrderResource\Pages;
-use App\Filament\Resources\OrderResource\RelationManagers;
+use Filament\Forms;
+use Filament\Tables;
 use App\Models\Order;
 use App\Models\Product;
-use Filament\Forms;
-use Filament\Forms\Components\MarkdownEditor;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Wizard;
-use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\DeleteAction;
+use App\Enums\OrderStatusEnum;
+use Filament\Resources\Resource;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Wizard;
+use Filament\Forms\Components\Repeater;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Wizard\Step;
+use Filament\Tables\Columns\Summarizers\Sum;
+use Filament\Forms\Components\MarkdownEditor;
+use App\Filament\Resources\OrderResource\Pages;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\OrderResource\RelationManagers;
 
 class OrderResource extends Resource
 {
@@ -33,6 +34,7 @@ class OrderResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
     protected static ?int $navigationSort = 3;
     protected static ?string $navigationGroup = 'Shop';
+    protected static ?string $recordTitleAttribute = 'number';
 
     public static function form(Form $form): Form
     {
@@ -65,7 +67,11 @@ class OrderResource extends Resource
                             ->schema([
                                 Select::make('product_id')
                                     ->label('Product Name')
-                                    ->options(Product::query()->pluck('name', 'id')),
+                                    ->options(Product::query()->pluck('name', 'id'))
+                                    ->required()
+                                    ->reactive()
+                                    ->afterStateUpdated(fn ($state, Forms\Set $set) =>
+                                    $set('unit_price', Product::find($state)?->price ?? 0)),
                                 TextInput::make('quantity')
                                     ->numeric()
                                     ->default(1)
@@ -75,7 +81,12 @@ class OrderResource extends Resource
                                     ->dehydrated()
                                     ->numeric()
                                     ->required(),
-                            ])->columns(3)
+                                // Placeholder::make('total_price')
+                                //     ->label('Total Price')
+                                //     ->content(function ($get) {
+                                //         return $get('quantity') * $get('unit_price');
+                                //     })
+                            ])->columns(4)
                     ]),
                 ])->columnSpanFull()
             ]);

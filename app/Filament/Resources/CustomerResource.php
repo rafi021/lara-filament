@@ -26,6 +26,16 @@ class CustomerResource extends Resource
     protected static ?string $navigationGroup = 'Shop';
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
+    protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'name',
+            'email',
+            'phone',
+        ];
+    }
 
     public static function form(Form $form): Form
     {
