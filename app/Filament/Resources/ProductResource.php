@@ -27,6 +27,8 @@ use Filament\Forms\Components\MarkdownEditor;
 use App\Filament\Resources\ProductResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ProductResource\RelationManagers;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 
 class ProductResource extends Resource
 {
@@ -141,7 +143,15 @@ class ProductResource extends Resource
                     ->toggleable(),
             ])
             ->filters([
-                //
+                TernaryFilter::make('is_visible')
+                    ->label('Visibility')
+                    ->boolean()
+                    ->trueLabel('Only visible products')
+                    ->falseLabel('Only hidden products')
+                    ->native(false),
+
+                SelectFilter::make('brand')
+                    ->relationship('brand', 'name')
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
