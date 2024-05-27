@@ -62,6 +62,11 @@ class OrderResource extends Resource
                             ->relationship('customer', 'name')
                             ->searchable()
                             ->required(),
+                        TextInput::make('shipping_price')
+                            ->label('Shipping Cost')
+                            ->numeric()
+                            ->dehydrated()
+                            ->required(),
                         Select::make('status')
                             ->options([
                                 'pending' => OrderStatusEnum::Pending->value,
@@ -74,7 +79,7 @@ class OrderResource extends Resource
                     ])->columns(2),
                     Step::make('Order Items')->schema([
                         Repeater::make('items')
-                            ->relationship('')
+                            ->relationship()
                             ->schema([
                                 Select::make('product_id')
                                     ->label('Product Name')
@@ -85,6 +90,8 @@ class OrderResource extends Resource
                                     $set('unit_price', Product::find($state)?->price ?? 0)),
                                 TextInput::make('quantity')
                                     ->numeric()
+                                    ->live()
+                                    ->dehydrated()
                                     ->default(1)
                                     ->required(),
                                 TextInput::make('unit_price')
@@ -92,11 +99,11 @@ class OrderResource extends Resource
                                     ->dehydrated()
                                     ->numeric()
                                     ->required(),
-                                // Placeholder::make('total_price')
-                                //     ->label('Total Price')
-                                //     ->content(function ($get) {
-                                //         return $get('quantity') * $get('unit_price');
-                                //     })
+                                Placeholder::make('total_price')
+                                    ->label('Total Price')
+                                    ->content(function ($get) {
+                                        return $get('quantity') * $get('unit_price');
+                                    })
                             ])->columns(4)
                     ]),
                 ])->columnSpanFull()
