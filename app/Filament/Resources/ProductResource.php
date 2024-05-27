@@ -101,7 +101,7 @@ class ProductResource extends Resource
                         Section::make('Pricing & Inventory')->schema([
                             TextInput::make('sku')
                                 ->label('SKU(stock keeping unit)')
-                                ->unique()
+                                ->unique(ignoreRecord: true)
                                 ->required(),
                             TextInput::make('price')
                                 ->numeric()
@@ -141,7 +141,13 @@ class ProductResource extends Resource
                                 ->imageEditor()
                         ])->collapsible(),
                         Section::make('Associations')->schema([
-                            Select::make('brand_id')->relationship('brand', 'name')
+                            Select::make('brand_id')
+                                ->relationship('brand', 'name')
+                                ->required(),
+                            Select::make('categories')
+                                ->relationship('categories', 'name')
+                                ->multiple()
+                                ->required(),
                         ])->collapsible(),
                     ]),
             ]);
