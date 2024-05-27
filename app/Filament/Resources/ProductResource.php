@@ -2,17 +2,27 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\ProductTypeEnum;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Product;
 use Faker\Provider\ar_EG\Text;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -28,7 +38,38 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Group::make()
+                    ->schema([
+                        Section::make('Information')->schema([
+                            TextInput::make('name'),
+                            TextInput::make('slug'),
+                            MarkdownEditor::make('description')
+                                ->columnSpan('full'),
+                        ])->columns(2),
+                        Section::make('Pricing & Inventory')->schema([
+                            TextInput::make('sku'),
+                            TextInput::make('price'),
+                            TextInput::make('quantity'),
+                            Select::make('type')->options([
+                                'downloadable' => ProductTypeEnum::Downloadable->value,
+                                'deliverable' => ProductTypeEnum::Deliverable->value
+                            ])
+                        ])->columns(2)
+                    ]),
+                Group::make()
+                    ->schema([
+                        Section::make('Status')->schema([
+                            Toggle::make('is_visible')->default(true),
+                            Toggle::make('is_featured')->default(true),
+                            DatePicker::make('published_at')
+                        ]),
+                        Section::make('Image')->schema([
+                            FileUpload::make('image')
+                        ])->collapsible(),
+                        Section::make('Associations')->schema([
+                            Select::make('brand_id')->relationship('brand', 'name')
+                        ])->collapsible(),
+                    ]),
             ]);
     }
 
