@@ -19,6 +19,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\MenuItem;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use pxlrbt\FilamentSpotlight\SpotlightPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -49,6 +50,9 @@ class AdminPanelProvider extends PanelProvider
                     ->url('')
                     ->icon('heroicon-o-cog-6-tooth'),
                 'logout' => MenuItem::make()->label('Log Out'),
+            ])
+            ->plugins([
+                SpotlightPlugin::make()
             ])
             // ->breadcrumbs(false)  // to hide it
             ->favicon('images/favicon-16x16.png')
